@@ -35,7 +35,7 @@ namespace WebApplication.Controllers
                 Version = "1.0",
                 Response = new EchoResponse
                 {
-                    OutputSpeech = new EchoSpeech { Type = "PlainText", Text = "Hello World" }
+                    OutputSpeech = new EchoSpeech { Type = "PlainText", Text = "Hi Frank, this is fun!" }
                 }
             };
         }
