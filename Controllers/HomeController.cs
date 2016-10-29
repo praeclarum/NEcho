@@ -11,21 +11,12 @@ namespace WebApplication.Controllers
     [Route("/")]
     public class HomeController : Controller
     {
-        // GET api/values
         [HttpGet]
-        public IEnumerable<string> Get()
+        public ActionResult Index()
         {
-            return new string[] { "value1111", "value2".ToUpperInvariant(), DateTime.Now.ToString() };
+            return View();
         }
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-        // POST api/values
         [HttpPost]
         public EchoServiceResponse Post([FromBody]EchoServiceRequest request)
         {
@@ -38,18 +29,6 @@ namespace WebApplication.Controllers
                     OutputSpeech = new EchoSpeech { Type = "PlainText", Text = "Hi Frank, this is fun!" }
                 }
             };
-        }
-
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
         }
     }
 }
