@@ -20,6 +20,12 @@ namespace EchoService
     public class EchoIntentValue
     {
         public string Name;
+        public Dictionary<string, EchoIntentSlotValue> Slots = new Dictionary<string, EchoIntentSlotValue>();
+    }
+    public class EchoIntentSlotValue
+    {
+        public string Name = "";
+        public string Value = "";
     }
     public class EchoServiceResponse
     {

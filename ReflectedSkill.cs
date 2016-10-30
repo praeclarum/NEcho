@@ -44,7 +44,7 @@ namespace EchoService
                         FullName = fullName,
                         IntentType = t,
                         EchoIntent = echoIntent,
-                        Fields = fields,
+                        Fields = fields.ToDictionary(x => x.Name),
                     };
                     var intentObj = Activator.CreateInstance(t) as Intent;
                     if (intentObj != null) {
@@ -110,6 +110,19 @@ namespace EchoService
         {
             var info = intentFromFullName[intentValue.Name];
             var intent = (Intent)Activator.CreateInstance(info.IntentType);
+
+            foreach (var s in intentValue.Slots) {
+                var name = s.Value.Name;
+                var value = s.Value.Value;
+                FieldInfo f;
+                if (info.Fields.TryGetValue(name, out f)) {
+                    var slott = f.FieldType;
+                    var slot = (Slot)Activator.CreateInstance(slott);
+                    slot.Value = value;
+                    f.SetValue(intent, slot);
+                }
+            }
+
             return intent;            
         }
 
@@ -140,7 +153,7 @@ namespace EchoService
     {
         public string FullName = "";
         public Type IntentType;
-        public FieldInfo[] Fields = new FieldInfo[0];
+        public Dictionary<string, FieldInfo> Fields = new Dictionary<string, FieldInfo>();
         public EchoBaseIntentInfo EchoIntent; 
     }
 
@@ -157,6 +170,7 @@ namespace EchoService
     } 
     public class Slot
     {
+        public string Value = "";
         public virtual string[] Samples { get { return new string[0]; } }        
-    } 
+    }
 }

@@ -1,20 +1,22 @@
+using EchoService;
+
 namespace Amazon
 {
-    public class AtCitySlot {}
-    public class AtRegionSlot {}
-    public class DateSlot {}
-    public class DeCitySlot {}
-    public class DeFirstNameSlot {}
-    public class DeRegionSlot {}
-    public class DurationSlot {}
-    public class EuropeCitySlot {}
-    public class FourDigitNumberSlot {}
-    public class GbCitySlot {}
-    public class GbFirstNameSlot {}
-    public class GbRegionSlot {}
-    public class NumberSlot {}
-    public class TimeSlot {}
-    public class UsCitySlot {}
-    public class UsFirstNameSlot {}
-    public class UsStateSlot {}
+    public class AtCitySlot : Slot {}
+    public class AtRegionSlot : Slot {}
+    public class DateSlot : Slot {}
+    public class DeCitySlot : Slot {}
+    public class DeFirstNameSlot : Slot {}
+    public class DeRegionSlot : Slot {}
+    public class DurationSlot : Slot {}
+    public class EuropeCitySlot : Slot {}
+    public class FourDigitNumberSlot : Slot {}
+    public class GbCitySlot : Slot {}
+    public class GbFirstNameSlot : Slot {}
+    public class GbRegionSlot : Slot {}
+    public class NumberSlot : Slot {}
+    public class TimeSlot : Slot {}
+    public class UsCitySlot : Slot {}
+    public class UsFirstNameSlot : Slot {}
+    public class UsStateSlot : Slot {}
 }

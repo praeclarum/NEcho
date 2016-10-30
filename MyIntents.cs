@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 
 using EchoService;
 
@@ -14,20 +16,47 @@ namespace My
             var t = DateTime.Now;
             Say (t.ToString());
         }
-        public async Task Stats (StatisticsIntent i)
+        public async Task Stats (StatisticsIntent si)
         {
+            var numbers = new List<double> ();
+
             Say ("What's the first number?");
-            var first = await Listen<NumberIntent> ();
+            var i = await Listen<NumberIntent> ();
+
             Say ("Next?");
+            numbers.Add(((NumberIntent)i).NumberValue);
             var done = false;
             while (!done) {
-                var next = await Listen<NumberIntent, GetStatIntent> ();
-                if (next is GetStatIntent) {
-                    Say("The stat is not a number. What's next?");
+                i = await Listen<NumberIntent, GetStatIntent> ();
+
+                if (i is NumberIntent) {
+                    numbers.Add(((NumberIntent)i).NumberValue);
                 }
-                else {
-                    Say ("Now what?");
+                else if (i is GetStatIntent) {
+                    var x = 0.0;
+                    switch (((GetStatIntent)i).Stat.Value) {
+                    case "mean":
+                    case "average":
+                        x = Math.Round(numbers.Average());
+                        Say($"The average is {x}.");
+                        break;
+                    case "sum":
+                        x = numbers.Sum();
+                        Say($"The sum is {x}.");
+                        break;
+                    case "min":
+                    case "minimum":
+                        x = numbers.Min();
+                        Say($"The min is {x}.");
+                        break;
+                    case "max":
+                    case "maximum":
+                        x = numbers.Max();
+                        Say($"The max is {x}.");
+                        break;
+                    }
                 }
+                Say("What's next?");
             }
         }
     }
@@ -37,16 +66,20 @@ namespace My
         public override string[] Samples => new string[] {
             "start statistics",
             "statistics",
+            "stats",
+            "start stats",
+            "begin stats",
         };
         
     }
 
     public class NumberIntent : Intent
     {
-        public Amazon.NumberSlot Value; 
+        public Amazon.NumberSlot Value;
+        public double NumberValue => double.Parse(Value.Value); 
         public override string[] Samples => new string[] {
             "{Value}",
-        };        
+        };
     }
 
     public class GetStatIntent : Intent
@@ -66,10 +99,11 @@ namespace My
         public override string[] Samples => new string[] {
             "average",
             "sum",
-            "variance",
             "mean",
-            "median",
-            "mode",
+            "min",
+            "max",
+            "minimum",
+            "maximum",
         };
         
     }
