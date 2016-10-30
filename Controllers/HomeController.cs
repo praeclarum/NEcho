@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 //using System.Linq;
 //using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -11,9 +12,15 @@ namespace WebApplication.Controllers
     [Route("/")]
     public class HomeController : Controller
     {
+        static readonly ReflectedSkill skill = new ReflectedSkill ();
+
         [HttpGet]
         public ActionResult Index()
         {
+            var settings = new JsonSerializerSettings();
+            settings.Formatting = Formatting.Indented;
+            settings.ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver();
+            ViewData["intentSchema"] = JsonConvert.SerializeObject(skill.EchoSkill.IntentSchema, settings);
             return View();
         }
 

@@ -15,9 +15,9 @@ namespace EchoService
     }
     public class EchoRequest
     {
-        public EchoIntent Intent;
+        public EchoIntentValue Intent;
     }
-    public class EchoIntent
+    public class EchoIntentValue
     {
         public string Name;
     }
@@ -49,7 +49,7 @@ namespace EchoService
     }
     public class EchoIntentSchema
     {
-        public EchoIntent[] Intents = new EchoIntent[0];
+        public EchoIntentInfo[] Intents = new EchoIntentInfo[0];
     }
     public class EchoSkill
     {
