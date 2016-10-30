@@ -37,9 +37,15 @@ namespace EchoService
         public string Type = "PlainText";
         public string Text = "";
     }
-    public class EchoIntentInfo
+    public abstract class EchoBaseIntentInfo
     {
         public string Intent = "";
+    }
+    public class EchoBuiltinIntentInfo : EchoBaseIntentInfo
+    {
+    }
+    public class EchoIntentInfo : EchoBaseIntentInfo
+    {
         public EchoIntentSlot[] Slots = new EchoIntentSlot[0];
     }
     public class EchoIntentSlot
@@ -49,7 +55,7 @@ namespace EchoService
     }
     public class EchoIntentSchema
     {
-        public EchoIntentInfo[] Intents = new EchoIntentInfo[0];
+        public EchoBaseIntentInfo[] Intents = new EchoIntentInfo[0];
     }
     public class EchoSkill
     {
