@@ -32,7 +32,7 @@ namespace EchoService
         {
             if (!inited) Init();
             var intentValue = request.Request.Intent;
-            var intentFullName = intentValue.Name;
+            var intentFullName = intentValue?.Name;
 
             Console.WriteLine("REQUEST INTENT " + intentFullName);
 
