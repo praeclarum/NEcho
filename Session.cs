@@ -94,6 +94,7 @@ namespace EchoService
             listenSource = new TaskCompletionSource<Intent>();
             var intentNames = intentTypes.Select(x => skill.TryFindIntent(x).FullName);
             listenIntents = new HashSet<string>(intentNames);
+            listening.Set();
             return listenSource.Task;
         }
         protected Task<Intent> Listen<T0>()
