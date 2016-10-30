@@ -18,6 +18,7 @@ namespace EchoService
         {
             var asm = Assembly.GetEntryAssembly();
             var types = asm.ExportedTypes;
+            var utterances = new List<EchoSampleUtterance>();
             foreach (var t in types) {
                 if (t.Name.EndsWith("Intent") && t.Name != "Intent") {
                     var ns = t.Namespace.ToUpperInvariant();
@@ -40,6 +41,15 @@ namespace EchoService
                         EchoIntent = echoIntent,
                         Fields = fields,
                     };
+                    var intentObj = Activator.CreateInstance(t) as Intent;
+                    if (intentObj != null) {
+                        foreach (var u in intentObj.Utterances) {
+                            utterances.Add(new EchoSampleUtterance {
+                                Intent = fullName,
+                                Utterance = u,
+                            });
+                        }
+                    }
                     intents.Add(intent);
                     intentFromFullName.Add(intent.FullName, intent);
                 }
@@ -51,6 +61,7 @@ namespace EchoService
                 IntentSchema = new EchoIntentSchema {
                     Intents = echoIntents,
                 },
+                SampleUtterances = utterances.ToArray(),
             };
         }
         public ReflectedIntentInfo TryFindIntent (string fullName)
