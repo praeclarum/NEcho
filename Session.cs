@@ -31,53 +31,66 @@ namespace EchoService
         public EchoServiceResponse HandleRequest (EchoServiceRequest request)
         {
             if (!inited) Init();
+
             var intentValue = request.Request.Intent;
-            var intentFullName = intentValue?.Name;
 
-            Console.WriteLine("REQUEST INTENT " + intentFullName);
-
-            var ls = listenSource;
-            var li = listenIntents;
-
-            lastSaid = "";
-            listenSource = null;
-            listenIntents = null;
-
-            if (ls != null && li != null && li.Count > 0 && li.Contains(intentFullName)) {
-                Console.WriteLine("CONTINUE SESSION");
-                var intent = skill.ParseIntent(intentValue);
-                ls.SetResult(intent);
+            if (intentValue == null) {
+                return new EchoServiceResponse
+                {
+                    Response = new EchoResponse
+                    {
+                        OutputSpeech = new EchoSpeech { Type = "PlainText", Text = "" },
+                        ShouldEndSession = true,
+                    },
+                };
             }
             else {
-                if (ls != null) {
-                    ls.SetCanceled();
-                    ls = null;
-                }
-                Console.WriteLine("START NEW SESSION");
-                Func<Intent, Task> startFunc;
-                if (intentFullName != null && startIntents.TryGetValue(intentFullName, out startFunc)) {
+                var intentFullName = intentValue.Name;
+
+                Console.WriteLine("REQUEST INTENT " + intentFullName);
+
+                var ls = listenSource;
+                var li = listenIntents;
+
+                lastSaid = "";
+                listenSource = null;
+                listenIntents = null;
+
+                if (ls != null && li != null && li.Count > 0 && li.Contains(intentFullName)) {
+                    Console.WriteLine("CONTINUE SESSION");
                     var intent = skill.ParseIntent(intentValue);
-                    var startTask = startFunc(intent);
+                    ls.SetResult(intent);
                 }
                 else {
-                    listening.Set();
+                    if (ls != null) {
+                        ls.SetCanceled();
+                        ls = null;
+                    }
+                    Console.WriteLine("START NEW SESSION");
+                    Func<Intent, Task> startFunc;
+                    if (startIntents.TryGetValue(intentFullName, out startFunc)) {
+                        var intent = skill.ParseIntent(intentValue);
+                        var startTask = startFunc(intent);
+                    }
+                    else {
+                        listening.Set();
+                    }
                 }
-            }
 
-            Console.WriteLine("LISTENING...");
-            listening.WaitOne(listenTimeout);
+                Console.WriteLine("LISTENING...");
+                listening.WaitOne(listenTimeout);
 
-            Console.WriteLine("DONE LISTENING, RESPONDING: " + lastSaid);
+                Console.WriteLine("DONE LISTENING, RESPONDING: " + lastSaid);
 
-            return new EchoServiceResponse
-            {
-                Version = "1.0",
-                Response = new EchoResponse
+                return new EchoServiceResponse
                 {
-                    OutputSpeech = new EchoSpeech { Type = "PlainText", Text = lastSaid },
-                    ShouldEndSession = listenIntents == null || listenIntents.Count == 0,
-                },
-            };
+                    Response = new EchoResponse
+                    {
+                        OutputSpeech = new EchoSpeech { Type = "PlainText", Text = lastSaid },
+                        ShouldEndSession = listenIntents == null || listenIntents.Count == 0,
+                    },
+                };
+            }
         }
 
         protected void Say(string message)
