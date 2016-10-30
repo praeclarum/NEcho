@@ -34,7 +34,7 @@ namespace My
                 }
                 else if (i is GetStatIntent) {
                     var x = 0.0;
-                    switch (((GetStatIntent)i).Stat.Value) {
+                    switch (((GetStatIntent)i).Stat.LowerValue) {
                     case "mean":
                     case "average":
                         x = Math.Round(numbers.Average());

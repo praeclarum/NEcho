@@ -171,6 +171,7 @@ namespace EchoService
     public class Slot
     {
         public string Value = "";
+        public string LowerValue => Value.ToLowerInvariant();
         public virtual string[] Samples { get { return new string[0]; } }        
     }
 }
