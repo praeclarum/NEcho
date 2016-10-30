@@ -11,6 +11,8 @@ namespace EchoService
         readonly List<ReflectedIntentInfo> intents = new List<ReflectedIntentInfo> ();
         readonly Dictionary<string, ReflectedIntentInfo> intentFromFullName =
             new Dictionary<string, ReflectedIntentInfo> ();
+        readonly Dictionary<Type, ReflectedIntentInfo> intentFromType =
+            new Dictionary<Type, ReflectedIntentInfo> ();
         readonly List<ReflectedSlotInfo> slots = new List<ReflectedSlotInfo> ();
         readonly Dictionary<string, ReflectedSlotInfo> slotFromFullName =
             new Dictionary<string, ReflectedSlotInfo> ();
@@ -55,6 +57,7 @@ namespace EchoService
                     }
                     intents.Add(intent);
                     intentFromFullName.Add(intent.FullName, intent);
+                    intentFromType.Add(t, intent);
                 }
                 else if (t.Name.EndsWith("Slot") && t.Name != "Slot") {
                     var values = new string[0];
@@ -95,6 +98,19 @@ namespace EchoService
             ReflectedIntentInfo i;
             intentFromFullName.TryGetValue (fullName, out i);
             return i;
+        }
+        public ReflectedIntentInfo TryFindIntent (Type type)
+        {
+            ReflectedIntentInfo i;
+            intentFromType.TryGetValue (type, out i);
+            return i;
+        }
+
+        public Intent ParseIntent (EchoIntentValue intentValue)
+        {
+            var info = intentFromFullName[intentValue.Name];
+            var intent = (Intent)Activator.CreateInstance(info.IntentType);
+            return intent;            
         }
 
         static string GetSlotFullName (Type slotType)

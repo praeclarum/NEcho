@@ -13,10 +13,17 @@ namespace WebApplication.Controllers
     public class HomeController : Controller
     {
         static readonly ReflectedSkill skill = new ReflectedSkill ();
+        static readonly Session session;
+
+        static HomeController()
+        {
+            session = new My.MySession (skill);
+        }
 
         [HttpGet]
         public ActionResult Index()
         {
+            session.InitIfNeeded();
             var settings = new JsonSerializerSettings();
             settings.Formatting = Formatting.Indented;
             settings.ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver();
@@ -30,14 +37,7 @@ namespace WebApplication.Controllers
         public EchoServiceResponse Post([FromBody]EchoServiceRequest request)
         {
             //Console.WriteLine("GOT REQUEST " + request.Request.Intent.Name);
-            return new EchoServiceResponse
-            {
-                Version = "1.0",
-                Response = new EchoResponse
-                {
-                    OutputSpeech = new EchoSpeech { Type = "PlainText", Text = "Hi Frank, this is fun!" }
-                }
-            };
+            return session.HandleRequest(request);
         }
     }
 }
