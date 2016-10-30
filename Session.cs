@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace EchoService
 {
@@ -24,7 +25,6 @@ namespace EchoService
         {
             this.skill = skill;
         }
-
         public void InitIfNeeded() {
             if (!inited) Init();
         }
@@ -36,24 +36,31 @@ namespace EchoService
 
             Console.WriteLine("REQUEST INTENT " + intentFullName);
 
-            lastSaid = "";
+            var ls = listenSource;
+            var li = listenIntents;
 
-            if (listenSource != null && listenIntents != null && listenIntents.Count > 0 && listenIntents.Contains(intentFullName)) {
+            lastSaid = "";
+            listenSource = null;
+            listenIntents = null;
+
+            if (ls != null && li != null && li.Count > 0 && li.Contains(intentFullName)) {
                 Console.WriteLine("CONTINUE SESSION");
                 var intent = skill.ParseIntent(intentValue);
-                listenSource.SetResult(intent);
+                ls.SetResult(intent);
             }
             else {
-                if (listenSource != null) {
-                    listenSource.SetCanceled();
-                    listenSource = null;
+                if (ls != null) {
+                    ls.SetCanceled();
+                    ls = null;
                 }
-                listenIntents = null;
                 Console.WriteLine("START NEW SESSION");
                 Func<Intent, Task> startFunc;
                 if (startIntents.TryGetValue(intentFullName, out startFunc)) {
                     var intent = skill.ParseIntent(intentValue);
                     var startTask = startFunc(intent);
+                }
+                else {
+                    listening.Set();
                 }
             }
 
@@ -68,14 +75,42 @@ namespace EchoService
                 Response = new EchoResponse
                 {
                     OutputSpeech = new EchoSpeech { Type = "PlainText", Text = lastSaid },
-                    ShouldEndSession = true,
+                    ShouldEndSession = listenIntents == null || listenIntents.Count == 0,
                 },
             };
         }
 
         protected void Say(string message)
         {
-            lastSaid = message;
+            if (lastSaid.Length == 0) lastSaid = message;
+            else lastSaid += " " + message;
+        }
+
+        protected Task<Intent> Listen(params Type[] intentTypes)
+        {
+            if (listenSource != null) {
+                listenSource.SetCanceled();
+            }
+            listenSource = new TaskCompletionSource<Intent>();
+            var intentNames = intentTypes.Select(x => skill.TryFindIntent(x).FullName);
+            listenIntents = new HashSet<string>(intentNames);
+            return listenSource.Task;
+        }
+        protected Task<Intent> Listen<T0>()
+        {
+            return Listen(typeof(T0));
+        }
+        protected Task<Intent> Listen<T0,T1>()
+        {
+            return Listen(typeof(T0), typeof(T1));
+        }
+        protected Task<Intent> Listen<T0,T1,T2>()
+        {
+            return Listen(typeof(T0), typeof(T1), typeof(T2));
+        }
+        protected Task<Intent> Listen<T0,T1,T2,T3>()
+        {
+            return Listen(typeof(T0), typeof(T1), typeof(T2), typeof(T3));
         }
 
         void Init()

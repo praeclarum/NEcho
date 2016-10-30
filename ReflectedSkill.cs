@@ -28,7 +28,7 @@ namespace EchoService
                 if (t.Name.EndsWith("Intent") && t.Name != "Intent") {
                     var ns = t.Namespace.ToUpperInvariant();
                     var name = t.Name;
-                    var fullName = ns + "." + name;
+                    var fullName = (ns == "AMAZON") ? ns + "." + name : name;
                     var fields = t.GetFields();
                     var echoIntent = t.Namespace == "Amazon" ?
                         (EchoBaseIntentInfo)(new EchoBuiltinIntentInfo { Intent = fullName }) :

@@ -5,40 +5,6 @@ using EchoService;
 
 namespace My
 {
-    public class ILikePersonIntent : Intent
-    {
-        public Amazon.UsFirstNameSlot Person;
-
-        public override string[] Utterances => new string[] {
-            "i like {Person}",
-            "i think like {Person}",
-            "maybe i think i like {Person}",
-            "{Person} is cool",
-        };
-    }
-
-    public class BinaryNumberExpressionIntent : Intent
-    {
-        public Amazon.NumberSlot X;
-        public BinaryOperatorSlot Op;
-        public Amazon.NumberSlot Y;
-
-        public override string[] Utterances => new string[] {
-            "{X} {Op} {Y}",
-            "{Op} {X} and {Y}",
-        };
-    }
-
-    public class BinaryOperatorSlot : Slot
-    {
-        public override string[] Values => new string[] {
-            "add",
-            "subtract",
-            "multiply",
-            "divide",
-        };
-    }
-
     public class MySession : Session
     {
         public MySession (ReflectedSkill skill) : base(skill) {}
@@ -56,6 +22,34 @@ namespace My
         {
             Say ("No, don't say no!");
         }
+        public async Task Stats (StatisticsIntent i)
+        {
+            Say ("What's the first number?");
+            var first = await Listen<NumberIntent> ();
+            Say ("Next?");
+            var done = false;
+            while (!done) {
+                var next = await Listen<NumberIntent> ();
+                Say ("Now what?");
+            }
+        }
+    }
+
+    public class StatisticsIntent : Intent
+    {
+        public override string[] Utterances => new string[] {
+            "start statistics",
+            "statistics",
+        };
+        
+    }
+
+    public class NumberIntent : Intent
+    {
+        public Amazon.NumberSlot Value; 
+        public override string[] Utterances => new string[] {
+            "{Value}",
+        };        
     }
 
     public class WhatTimeIsItIntent : Intent
