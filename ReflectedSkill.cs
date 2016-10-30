@@ -48,7 +48,7 @@ namespace EchoService
                     };
                     var intentObj = Activator.CreateInstance(t) as Intent;
                     if (intentObj != null) {
-                        foreach (var u in intentObj.Utterances) {
+                        foreach (var u in intentObj.Samples) {
                             utterances.Add(new EchoSampleUtterance {
                                 Intent = fullName,
                                 Utterance = u,
@@ -63,7 +63,7 @@ namespace EchoService
                     var values = new string[0];
                     var slotObj = Activator.CreateInstance(t) as Slot;
                     if (slotObj != null) {
-                        values = slotObj.Values;
+                        values = slotObj.Samples;
                     }
                     var fullName = GetSlotFullName(t);
                     var echoSlot =
@@ -132,7 +132,7 @@ namespace EchoService
                 lastUpper = u;
             }     
             var name = string.Join("_", parts).ToUpperInvariant();
-            return ns + "." + name;
+            return (ns == "AMAZON") ? ns + "." + name : name;
         }
     }
 
@@ -153,10 +153,10 @@ namespace EchoService
 
     public class Intent
     {
-        public virtual string[] Utterances { get { return new string[0]; } }        
+        public virtual string[] Samples { get { return new string[0]; } }        
     } 
     public class Slot
     {
-        public virtual string[] Values { get { return new string[0]; } }        
+        public virtual string[] Samples { get { return new string[0]; } }        
     } 
 }

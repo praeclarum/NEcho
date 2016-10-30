@@ -14,14 +14,6 @@ namespace My
             var t = DateTime.Now;
             Say (t.ToString());
         }
-        public async Task Yes (Amazon.YesIntent i)
-        {
-            Say ("Why did you say yes?");
-        }
-        public async Task No (Amazon.NoIntent i)
-        {
-            Say ("No, don't say no!");
-        }
         public async Task Stats (StatisticsIntent i)
         {
             Say ("What's the first number?");
@@ -29,15 +21,20 @@ namespace My
             Say ("Next?");
             var done = false;
             while (!done) {
-                var next = await Listen<NumberIntent> ();
-                Say ("Now what?");
+                var next = await Listen<NumberIntent, GetStatIntent> ();
+                if (next is GetStatIntent) {
+                    Say("The stat is not a number. What's next?");
+                }
+                else {
+                    Say ("Now what?");
+                }
             }
         }
     }
 
     public class StatisticsIntent : Intent
     {
-        public override string[] Utterances => new string[] {
+        public override string[] Samples => new string[] {
             "start statistics",
             "statistics",
         };
@@ -47,14 +44,38 @@ namespace My
     public class NumberIntent : Intent
     {
         public Amazon.NumberSlot Value; 
-        public override string[] Utterances => new string[] {
+        public override string[] Samples => new string[] {
             "{Value}",
         };        
     }
 
+    public class GetStatIntent : Intent
+    {
+        public StatSlot Stat;
+        public override string[] Samples => new string[] {
+            "what's the {Stat}",
+            "{Stat}",
+            "now what's the {Stat}",
+            "{Stat} is",
+            "{Stat} is equal to",
+        };
+        
+    }
+    public class StatSlot : Slot
+    {
+        public override string[] Samples => new string[] {
+            "average",
+            "sum",
+            "variance",
+            "mean",
+            "median",
+            "mode",
+        };
+        
+    }
     public class WhatTimeIsItIntent : Intent
     {
-        public override string[] Utterances => new string[] {
+        public override string[] Samples => new string[] {
             "what time is it",
             "what's the time",
         };
