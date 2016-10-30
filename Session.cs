@@ -55,7 +55,7 @@ namespace EchoService
                 }
                 Console.WriteLine("START NEW SESSION");
                 Func<Intent, Task> startFunc;
-                if (startIntents.TryGetValue(intentFullName, out startFunc)) {
+                if (intentFullName != null && startIntents.TryGetValue(intentFullName, out startFunc)) {
                     var intent = skill.ParseIntent(intentValue);
                     var startTask = startFunc(intent);
                 }
