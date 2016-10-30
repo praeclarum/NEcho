@@ -22,6 +22,7 @@ namespace WebApplication.Controllers
             settings.ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver();
             ViewData["intentSchema"] = JsonConvert.SerializeObject(skill.EchoSkill.IntentSchema, settings);
             ViewData["sampleUtterances"] = string.Join("\n", skill.EchoSkill.SampleUtterances.Select(x => x.Intent + " " + x.Utterance));
+            ViewData["customSlotTypes"] = skill.EchoSkill.CustomSlotTypes;
             return View();
         }
 

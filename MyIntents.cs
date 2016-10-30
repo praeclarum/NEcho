@@ -28,8 +28,14 @@ namespace My
         };
     }
 
-    public class BinaryOperatorSlot
+    public class BinaryOperatorSlot : Slot
     {
+        public override string[] Values => new string[] {
+            "add",
+            "subtract",
+            "multiply",
+            "divide",
+        };
     }
 }
 

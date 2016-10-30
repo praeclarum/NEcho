@@ -11,6 +11,9 @@ namespace EchoService
         readonly List<ReflectedIntentInfo> intents = new List<ReflectedIntentInfo> ();
         readonly Dictionary<string, ReflectedIntentInfo> intentFromFullName =
             new Dictionary<string, ReflectedIntentInfo> ();
+        readonly List<ReflectedSlotInfo> slots = new List<ReflectedSlotInfo> ();
+        readonly Dictionary<string, ReflectedSlotInfo> slotFromFullName =
+            new Dictionary<string, ReflectedSlotInfo> ();
         readonly EchoSkill echoSkill;
 
         public EchoSkill EchoSkill => echoSkill;
@@ -30,7 +33,7 @@ namespace EchoService
                         (new EchoIntentInfo {
                             Intent = fullName,
                             Slots = fields.Select (x =>
-                                new EchoIntentSlot {
+                                new EchoIntentSlotInfo {
                                     Name = x.Name,
                                     Type = GetSlotFullName(x.FieldType)
                                 }).ToArray(),
@@ -53,15 +56,38 @@ namespace EchoService
                     intents.Add(intent);
                     intentFromFullName.Add(intent.FullName, intent);
                 }
+                else if (t.Name.EndsWith("Slot") && t.Name != "Slot") {
+                    var values = new string[0];
+                    var slotObj = Activator.CreateInstance(t) as Slot;
+                    if (slotObj != null) {
+                        values = slotObj.Values;
+                    }
+                    var fullName = GetSlotFullName(t);
+                    var echoSlot =
+                        new EchoCustomSlotType {
+                            Name = fullName,
+                            Values = values};
+                    var slot = new ReflectedSlotInfo {
+                        FullName = fullName,
+                        SlotType = t,
+                        EchoSlot = echoSlot,
+                    };
+                    slots.Add(slot);
+                    slotFromFullName.Add(slot.FullName, slot);
+                }
             }
 
             var echoIntents =
                 intents.Select(x => x.EchoIntent).ToArray();
+            var echoSlots =
+                slots.Where(x => !x.FullName.StartsWith("AMAZON.")).
+                Select(x => x.EchoSlot).ToArray();
             echoSkill = new EchoSkill {
                 IntentSchema = new EchoIntentSchema {
                     Intents = echoIntents,
                 },
                 SampleUtterances = utterances.ToArray(),
+                CustomSlotTypes = echoSlots, 
             };
         }
         public ReflectedIntentInfo TryFindIntent (string fullName)
@@ -102,8 +128,19 @@ namespace EchoService
         public EchoBaseIntentInfo EchoIntent; 
     }
 
+    public class ReflectedSlotInfo
+    {
+        public string FullName = "";
+        public Type SlotType;
+        public EchoCustomSlotType EchoSlot;
+    }
+
     public class Intent
     {
         public virtual string[] Utterances { get { return new string[0]; } }        
+    } 
+    public class Slot
+    {
+        public virtual string[] Values { get { return new string[0]; } }        
     } 
 }

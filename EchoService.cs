@@ -46,9 +46,9 @@ namespace EchoService
     }
     public class EchoIntentInfo : EchoBaseIntentInfo
     {
-        public EchoIntentSlot[] Slots = new EchoIntentSlot[0];
+        public EchoIntentSlotInfo[] Slots = new EchoIntentSlotInfo[0];
     }
-    public class EchoIntentSlot
+    public class EchoIntentSlotInfo
     {
         public string Name = "";
         public string Type = "";
@@ -60,7 +60,7 @@ namespace EchoService
     public class EchoSkill
     {
         public EchoIntentSchema IntentSchema;
-        public EchoCustomSlotType CustomSlotTypes;
+        public EchoCustomSlotType[] CustomSlotTypes;
         public EchoSampleUtterance[] SampleUtterances = new EchoSampleUtterance[0];
     }
     public class EchoSampleUtterance
