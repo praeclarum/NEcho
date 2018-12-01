@@ -3,8 +3,9 @@ using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using NEcho.WebServiceData;
 
-namespace EchoService
+namespace NEcho
 {
     public class ReflectedSkill
     {
@@ -30,7 +31,7 @@ namespace EchoService
                     var name = t.Name;
                     var fullName = (ns == "AMAZON") ? ns + "." + name : name;
                     var fields = t.GetFields();
-                    var echoIntent = t.Namespace == "Amazon" ?
+                    var echoIntent = t.Namespace == "NEcho.Amazon" ?
                         (EchoBaseIntentInfo)(new EchoBuiltinIntentInfo { Intent = fullName }) :
                         (new EchoIntentInfo {
                             Intent = fullName,
@@ -106,7 +107,7 @@ namespace EchoService
             return i;
         }
 
-        public Intent ParseIntent (EchoIntentValue intentValue)
+        public Intent ParseIntent (WebServiceData.EchoIntentValue intentValue)
         {
             var info = intentFromFullName[intentValue.Name];
             var intent = (Intent)Activator.CreateInstance(info.IntentType);

@@ -5,19 +5,16 @@ using System.Linq;
 //using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
-using EchoService;
-
-namespace WebApplication.Controllers
+namespace NEcho.Controllers
 {
     [Route("/")]
     public class HomeController : Controller
     {
-        static readonly ReflectedSkill skill = new ReflectedSkill ();
-        static readonly Session session;
+        static readonly EchoSession session;
 
         static HomeController()
         {
-            session = new My.MySession (skill);
+            session = new My.MySession ();
         }
 
         [HttpGet]
@@ -27,15 +24,16 @@ namespace WebApplication.Controllers
             var settings = new JsonSerializerSettings();
             settings.Formatting = Formatting.Indented;
             settings.ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver();
-            ViewData["intentSchema"] = JsonConvert.SerializeObject(skill.EchoSkill.IntentSchema, settings);
-            ViewData["sampleUtterances"] = string.Join("\n", skill.EchoSkill.SampleUtterances.Select(x => x.Intent + " " + x.Utterance));
-            ViewData["customSlotTypes"] = skill.EchoSkill.CustomSlotTypes;
+            ViewData["intentSchema"] = JsonConvert.SerializeObject(session.Skill.IntentSchema, settings);
+            ViewData["sampleUtterances"] = string.Join("\n", session.Skill.SampleUtterances.Select(x => x.Intent + " " + x.Utterance));
+            ViewData["customSlotTypes"] = session.Skill.CustomSlotTypes;
             return View();
         }
 
         [HttpPost]
-        public EchoServiceResponse Post([FromBody]EchoServiceRequest request)
+        public WebServiceData.EchoServiceResponse Post([FromBody]WebServiceData.EchoServiceRequest request)
         {
+            session.InitIfNeeded ();
             //Console.WriteLine("GOT REQUEST " + request.Request.Intent.Name);
             return session.HandleRequest(request);
         }

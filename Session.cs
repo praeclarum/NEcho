@@ -5,11 +5,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
 
-namespace EchoService
+using NEcho.WebServiceData;
+
+namespace NEcho
 {
-    public class Session
+    public class EchoSession
     {
-        readonly ReflectedSkill skill;
+        readonly static ReflectedSkill reflectedSkill = new ReflectedSkill ();
+        public EchoSkill Skill => reflectedSkill.EchoSkill;
 
         readonly TimeSpan listenTimeout = TimeSpan.FromSeconds(5.0);
 
@@ -21,9 +24,8 @@ namespace EchoService
         readonly AutoResetEvent listening = new AutoResetEvent(false);
 
         string lastSaid = "";
-        public Session(ReflectedSkill skill)
+        public EchoSession()
         {
-            this.skill = skill;
         }
         public void InitIfNeeded() {
             if (!inited) Init();
@@ -58,7 +60,7 @@ namespace EchoService
 
                 if (ls != null && li != null && li.Count > 0 && li.Contains(intentFullName)) {
                     Console.WriteLine("CONTINUE SESSION");
-                    var intent = skill.ParseIntent(intentValue);
+                    var intent = reflectedSkill.ParseIntent(intentValue);
                     ls.SetResult(intent);
                 }
                 else {
@@ -69,7 +71,7 @@ namespace EchoService
                     Console.WriteLine("START NEW SESSION");
                     Func<Intent, Task> startFunc;
                     if (startIntents.TryGetValue(intentFullName, out startFunc)) {
-                        var intent = skill.ParseIntent(intentValue);
+                        var intent = reflectedSkill.ParseIntent(intentValue);
                         var startTask = startFunc(intent);
                     }
                     else {
@@ -105,7 +107,7 @@ namespace EchoService
                 listenSource.SetCanceled();
             }
             listenSource = new TaskCompletionSource<Intent>();
-            var intentNames = intentTypes.Select(x => skill.TryFindIntent(x).FullName);
+            var intentNames = intentTypes.Select(x => reflectedSkill.TryFindIntent(x).FullName);
             listenIntents = new HashSet<string>(intentNames);
             listening.Set();
             return listenSource.Task;
@@ -139,7 +141,7 @@ namespace EchoService
                 if (isTask && ps.Length == 1) {
                     var p = ps[0];
                     var n = m.Name;
-                    var i = skill.TryFindIntent(p.ParameterType); 
+                    var i = reflectedSkill.TryFindIntent(p.ParameterType); 
                     if (i != null && !startIntents.ContainsKey(i.FullName)) {
                         startIntents.Add(i.FullName, async x => {
                             await (Task)m.Invoke(this, new object[]{x});
@@ -149,7 +151,6 @@ namespace EchoService
                 }
             }
         }
-
     }
 }
 

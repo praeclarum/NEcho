@@ -16,7 +16,7 @@
 
 <section>
 <h1>Custom Slot Types</h1>
-@foreach(var s in (IEnumerable<EchoService.EchoCustomSlotType>)ViewData["customSlotTypes"]) {
+@foreach(var s in (IEnumerable<NEcho.WebServiceData.EchoCustomSlotType>)ViewData["customSlotTypes"]) {
     <section>
     <h1>@s.Name</h1>
     <code><pre>@foreach (var v in s.Values) { @(v + "\n") }</pre></code>

@@ -3,18 +3,18 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 
-using EchoService;
+using NEcho;
+using Amazon;
 
 namespace My
 {
-    public class MySession : Session
+    public class MySession : EchoSession
     {
-        public MySession (ReflectedSkill skill) : base(skill) {}
-
-        public async Task WhatTimeIsIt (WhatTimeIsItIntent i)
+        public Task WhatTimeIsIt (WhatTimeIsItIntent i)
         {
             var t = DateTime.Now;
             Say (t.ToString());
+            return Task.FromResult (0);
         }
         public async Task Stats (StatisticsIntent si)
         {
@@ -75,7 +75,7 @@ namespace My
 
     public class NumberIntent : Intent
     {
-        public Amazon.NumberSlot Value;
+        public NumberSlot Value;
         public double NumberValue => double.Parse(Value.Value); 
         public override string[] Samples => new string[] {
             "{Value}",
@@ -105,15 +105,12 @@ namespace My
             "minimum",
             "maximum",
         };
-        
     }
     public class WhatTimeIsItIntent : Intent
     {
         public override string[] Samples => new string[] {
             "what time is it",
             "what's the time",
-        };
-        
+        };        
     }
 }
-
